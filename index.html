@@ -1,0 +1,1603 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Benxx Project — Generator Akun V2ray</title>
+    <meta
+      name="description"
+      content="Generator akun V2ray berbasis Cloudflare Workers. VMESS, VLESS, TROJAN, dan SHADOWSOCKS — gratis, cepat, tanpa registrasi."
+    />
+    <link
+      rel="icon"
+      type="image/x-icon"
+      href="https://raw.githubusercontent.com/ziyosen/xproject-vpn/master/Screenshot_20250626-032808.png"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <style>
+      /* ============================================================
+         SLIDE COLOR — animatable custom property
+         ============================================================ */
+      @property --slide-color {
+        syntax: "<color>";
+        inherits: true;
+        initial-value: #6366f1;
+      }
+
+      /* ============================================================
+         DESIGN TOKENS
+         ============================================================ */
+      :root {
+        --bg: #08090c;
+        --text: #eceef4;
+        --muted: #939aab;
+        --muted-2: #6b7280;
+        --border: rgba(255, 255, 255, 0.085);
+        --border-strong: rgba(255, 255, 255, 0.16);
+        --nav-h: 64px;
+        --slide-color: #6366f1;
+        transition: --slide-color 0.85s ease;
+      }
+
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        height: 100%;
+      }
+
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+        font-family: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+        overflow: hidden;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+
+      /* ============================================================
+         COVER — tirai pembuka
+         ============================================================ */
+      .cover {
+        position: fixed;
+        inset: 0;
+        z-index: 200;
+        display: grid;
+        place-items: center;
+        background: #08090c;
+      }
+
+      .cover-inner {
+        text-align: center;
+      }
+
+      .cover-mark {
+        width: 66px;
+        height: 66px;
+        border-radius: 20px;
+        display: grid;
+        place-items: center;
+        margin: 0 auto 18px;
+        background: linear-gradient(160deg, #6366f1, #4f46e5);
+        color: #fff;
+        font-size: 26px;
+        box-shadow: 0 24px 60px -24px #6366f1;
+      }
+
+      .cover-text {
+        font-size: 12px;
+        letter-spacing: 0.3em;
+        text-transform: uppercase;
+        color: var(--muted);
+        font-weight: 600;
+      }
+
+      /* ============================================================
+         INDICATOR — garis sweep di paling atas
+         ============================================================ */
+      .indicator {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        z-index: 120;
+        background: rgba(255, 255, 255, 0.05);
+        pointer-events: none;
+      }
+
+      .indicator span {
+        display: block;
+        height: 100%;
+        width: 0;
+        background: linear-gradient(90deg, #6366f1, #8b5cf6);
+      }
+
+      /* ============================================================
+         NAV
+         ============================================================ */
+      .topnav {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: var(--nav-h);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 clamp(18px, 5vw, 72px);
+        z-index: 110;
+        background: linear-gradient(
+          180deg,
+          rgba(8, 9, 12, 0.9),
+          rgba(8, 9, 12, 0)
+        );
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 11px;
+        text-decoration: none;
+        color: var(--text);
+      }
+
+      .brand-mark {
+        width: 38px;
+        height: 38px;
+        border-radius: 12px;
+        display: grid;
+        place-items: center;
+        background: linear-gradient(160deg, #6366f1, #4f46e5);
+        color: #fff;
+        font-size: 16px;
+        box-shadow: 0 12px 28px -14px #6366f1;
+      }
+
+      .brand-text {
+        font-size: 16px;
+        font-weight: 700;
+        letter-spacing: -0.01em;
+        white-space: nowrap;
+      }
+
+      .brand-text em {
+        font-style: normal;
+        color: var(--muted);
+        font-weight: 500;
+        margin-left: 5px;
+      }
+
+      .nav-links {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+
+      .nav-links button,
+      .nav-links a {
+        appearance: none;
+        background: none;
+        border: 0;
+        font-family: inherit;
+        font-size: 12.5px;
+        font-weight: 500;
+        color: var(--muted);
+        padding: 8px 13px;
+        border-radius: 99px;
+        cursor: pointer;
+        text-decoration: none;
+        white-space: nowrap;
+        transition: color 0.18s ease, background 0.18s ease;
+      }
+
+      .nav-links button:hover,
+      .nav-links a:hover {
+        color: var(--text);
+        background: rgba(255, 255, 255, 0.05);
+      }
+
+      .nav-links button.active {
+        color: var(--text);
+        background: rgba(255, 255, 255, 0.08);
+      }
+
+      .nav-toggle {
+        display: none;
+        width: 40px;
+        height: 40px;
+        border-radius: 12px;
+        border: 1px solid var(--border);
+        background: rgba(255, 255, 255, 0.04);
+        color: var(--text);
+        font-size: 15px;
+        cursor: pointer;
+        place-items: center;
+      }
+
+      /* ============================================================
+         STAGE
+         ============================================================ */
+      .stage {
+        position: fixed;
+        inset: 0;
+        overflow: hidden;
+      }
+
+      /* ---------- CARD (latar slide) ---------- */
+      .card {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(180deg, #0a0b10 0%, #08090c 100%);
+        overflow: hidden;
+      }
+
+      .card-grid {
+        position: absolute;
+        inset: 0;
+        background-image: linear-gradient(
+            rgba(255, 255, 255, 0.028) 1px,
+            transparent 1px
+          ),
+          linear-gradient(90deg, rgba(255, 255, 255, 0.028) 1px, transparent 1px);
+        background-size: 56px 56px;
+        -webkit-mask-image: radial-gradient(
+          120% 100% at 68% 26%,
+          #000 18%,
+          transparent 76%
+        );
+        mask-image: radial-gradient(
+          120% 100% at 68% 26%,
+          #000 18%,
+          transparent 76%
+        );
+        pointer-events: none;
+      }
+
+      .card-glow {
+        position: absolute;
+        top: -16%;
+        right: -12%;
+        width: min(780px, 88vw);
+        height: min(780px, 88vw);
+        border-radius: 50%;
+        background: var(--slide-color);
+        filter: blur(120px);
+        opacity: 0.3;
+        pointer-events: none;
+      }
+
+      .card-glow.second {
+        top: auto;
+        right: auto;
+        bottom: -30%;
+        left: -14%;
+        width: min(620px, 74vw);
+        height: min(620px, 74vw);
+        opacity: 0.12;
+      }
+
+      .card-icon {
+        position: absolute;
+        right: clamp(16px, 6vw, 96px);
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: clamp(130px, 26vw, 320px);
+        line-height: 1;
+        color: var(--slide-color);
+        opacity: 0.14;
+        pointer-events: none;
+      }
+
+      .card-kicker {
+        position: absolute;
+        top: calc(var(--nav-h) + 6px);
+        left: clamp(18px, 5vw, 72px);
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.22em;
+        text-transform: uppercase;
+        color: rgba(255, 255, 255, 0.24);
+        pointer-events: none;
+      }
+
+      /* ---------- DETAILS ---------- */
+      .details {
+        position: absolute;
+        left: clamp(18px, 5vw, 72px);
+        bottom: clamp(66px, 11vh, 108px);
+        width: min(640px, 74vw);
+        max-height: calc(100vh - var(--nav-h) - 74px);
+        max-height: calc(100dvh - var(--nav-h) - 74px);
+        overflow-y: auto;
+        overflow-x: hidden;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+        z-index: 5;
+      }
+
+      .details::-webkit-scrollbar {
+        display: none;
+      }
+
+      .place-box {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 14px;
+        overflow: hidden;
+      }
+
+      .place-box .dash {
+        width: 26px;
+        height: 3px;
+        border-radius: 99px;
+        background: var(--slide-color);
+        flex: 0 0 auto;
+      }
+
+      .place-box .text {
+        font-size: 11.5px;
+        font-weight: 600;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+
+      .title-box {
+        overflow: hidden;
+      }
+
+      .title-1,
+      .title-2 {
+        margin: 0;
+        font-size: clamp(36px, 7.2vw, 84px);
+        font-weight: 800;
+        letter-spacing: -0.035em;
+        line-height: 1.02;
+        text-transform: uppercase;
+      }
+
+      .title-1 {
+        color: var(--text);
+      }
+
+      .title-2 {
+        color: var(--slide-color);
+      }
+
+      .desc {
+        margin: 16px 0 0;
+        max-width: 530px;
+        font-size: clamp(12.5px, 1.15vw, 14.5px);
+        line-height: 1.75;
+        color: var(--muted);
+      }
+
+      .detail-chips {
+        display: none;
+        flex-wrap: wrap;
+        gap: 7px;
+        margin-top: 16px;
+      }
+
+      .detail-chips.on {
+        display: flex;
+      }
+
+      .detail-chips span {
+        font-size: 10.5px;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        padding: 6px 12px;
+        border-radius: 99px;
+        color: var(--slide-color);
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid var(--border);
+      }
+
+      .cta {
+        margin-top: 22px;
+      }
+
+      .discover {
+        display: inline-flex;
+        align-items: center;
+        gap: 9px;
+        padding: 13px 21px;
+        border-radius: 99px;
+        font-size: 13px;
+        font-weight: 600;
+        color: #fff;
+        text-decoration: none;
+        background: var(--slide-color);
+        box-shadow: 0 16px 34px -16px var(--slide-color);
+        transition: transform 0.18s ease, box-shadow 0.18s ease;
+      }
+
+      .discover:hover {
+        transform: translateY(-2px);
+      }
+
+      .discover i {
+        font-size: 11px;
+      }
+
+      /* ---------- PAGINATION ---------- */
+      /* kontrol navigasi disembunyikan — slider tetap jalan lewat
+         auto-loop, swipe, keyboard, dan menu navigasi */
+      .pagination {
+        position: absolute;
+        right: clamp(18px, 5vw, 72px);
+        bottom: clamp(66px, 11vh, 108px);
+        display: none;
+        align-items: center;
+        gap: 13px;
+        z-index: 6;
+      }
+
+      .arrow {
+        width: 46px;
+        height: 46px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid var(--border);
+        color: var(--text);
+        cursor: pointer;
+        font-family: inherit;
+        font-size: 14px;
+        transition: background 0.18s ease, border-color 0.18s ease,
+          transform 0.18s ease;
+      }
+
+      .arrow:hover {
+        background: rgba(255, 255, 255, 0.1);
+        border-color: var(--border-strong);
+        transform: translateY(-2px);
+      }
+
+      .progress-sub-container {
+        width: clamp(80px, 13vw, 170px);
+      }
+
+      .progress-sub-background {
+        height: 3px;
+        border-radius: 99px;
+        background: rgba(255, 255, 255, 0.12);
+        overflow: hidden;
+      }
+
+      .progress-sub-foreground {
+        height: 100%;
+        width: 0;
+        border-radius: 99px;
+        background: var(--slide-color);
+      }
+
+      .slide-numbers {
+        display: flex;
+        align-items: baseline;
+        gap: 7px;
+        font-family: "JetBrains Mono", monospace;
+      }
+
+      .slide-numbers .item {
+        font-size: 12.5px;
+        font-weight: 500;
+        color: var(--muted-2);
+        cursor: pointer;
+        transition: color 0.25s ease, font-size 0.25s ease;
+      }
+
+      .slide-numbers .item:hover {
+        color: var(--muted);
+      }
+
+      .slide-numbers .item.active {
+        font-size: 19px;
+        font-weight: 700;
+        color: var(--text);
+      }
+
+      /* ---------- STRIP (mini cards) ---------- */
+      .strip {
+        position: absolute;
+        left: clamp(18px, 5vw, 72px);
+        right: clamp(18px, 5vw, 72px);
+        bottom: 36px;
+        display: none;
+        gap: 9px;
+        overflow-x: auto;
+        overflow-y: hidden;
+        padding-bottom: 4px;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+        z-index: 7;
+      }
+
+      .strip::-webkit-scrollbar {
+        display: none;
+      }
+
+      .tile {
+        flex: 0 0 auto;
+        width: 54px;
+        height: 54px;
+        border-radius: 15px;
+        display: grid;
+        place-items: center;
+        font-size: 15px;
+        font-family: inherit;
+        color: var(--muted);
+        background: rgba(255, 255, 255, 0.035);
+        border: 1px solid var(--border);
+        cursor: pointer;
+        transition: color 0.22s ease, background 0.22s ease,
+          border-color 0.22s ease, transform 0.22s ease,
+          box-shadow 0.22s ease;
+      }
+
+      .tile:hover {
+        color: var(--text);
+        border-color: var(--border-strong);
+        transform: translateY(-3px);
+      }
+
+      .tile.active {
+        color: #fff;
+        border-color: transparent;
+        background: var(--slide-color);
+        box-shadow: 0 16px 30px -16px var(--slide-color);
+        transform: translateY(-3px) scale(1.06);
+      }
+
+      /* ---------- COPY ---------- */
+      .copy {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 12px;
+        text-align: center;
+        font-size: 10.5px;
+        color: var(--muted-2);
+        z-index: 7;
+        pointer-events: none;
+        padding: 0 16px;
+      }
+
+      .copy .sep {
+        margin: 0 7px;
+        opacity: 0.5;
+      }
+
+      /* ---------- label jaringan provider ---------- */
+      .mq-label {
+        margin: 22px 0 10px;
+        font-size: 9.5px;
+        font-weight: 600;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--muted-2);
+      }
+
+      /* ---------- strip statistik (statis, di bawah tombol CTA) ---------- */
+      .stat-strip {
+        margin-top: 22px;
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 1px;
+        max-width: 100%;
+        background: var(--border);
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        overflow: hidden;
+      }
+
+      .stat-strip .st {
+        padding: 17px 17px 16px;
+        background: rgba(9, 10, 14, 0.72);
+      }
+
+      .stat-strip .st::before {
+        content: "";
+        display: block;
+        width: 20px;
+        height: 3px;
+        border-radius: 99px;
+        background: var(--sc, var(--slide-color));
+        margin-bottom: 12px;
+      }
+
+      .stat-strip .st b {
+        display: block;
+        font-size: clamp(20px, 2.1vw, 27px);
+        font-weight: 800;
+        letter-spacing: -0.03em;
+        line-height: 1.05;
+        color: var(--text);
+      }
+
+      .stat-strip .st span {
+        display: block;
+        margin-top: 6px;
+        font-size: 9.5px;
+        font-weight: 600;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--muted-2);
+      }
+
+      /* ---------- marquee provider ---------- */
+      .marquee {
+        -webkit-mask-image: linear-gradient(
+          90deg,
+          transparent,
+          #000 7%,
+          #000 93%,
+          transparent
+        );
+        mask-image: linear-gradient(
+          90deg,
+          transparent,
+          #000 7%,
+          #000 93%,
+          transparent
+        );
+      }
+
+      .marquee-row {
+        overflow: hidden;
+        padding: 5px 0;
+      }
+
+      .marquee-track {
+        display: flex;
+        width: max-content;
+        animation: mq-left 36s linear infinite;
+      }
+
+      .marquee-row.rev .marquee-track {
+        animation-name: mq-right;
+        animation-duration: 44s;
+      }
+
+      @keyframes mq-left {
+        from {
+          transform: translateX(0);
+        }
+        to {
+          transform: translateX(-33.3333%);
+        }
+      }
+
+      @keyframes mq-right {
+        from {
+          transform: translateX(-33.3333%);
+        }
+        to {
+          transform: translateX(0);
+        }
+      }
+
+      .pv {
+        flex: 0 0 auto;
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        height: 46px;
+        padding: 0 16px;
+        margin-right: 10px;
+        border-radius: 13px;
+        background: rgba(255, 255, 255, 0.035);
+        border: 1px solid var(--border);
+        white-space: nowrap;
+      }
+
+      .pv img {
+        width: 17px;
+        height: 17px;
+        flex: 0 0 auto;
+        object-fit: contain;
+      }
+
+      .pv i {
+        width: 17px;
+        font-size: 15px;
+        line-height: 1;
+        text-align: center;
+        color: #8b93a7;
+        flex: 0 0 auto;
+      }
+
+      .pv-mono {
+        flex: 0 0 auto;
+        width: 17px;
+        height: 17px;
+        border-radius: 5px;
+        background: rgba(255, 255, 255, 0.1);
+        color: #a8b0c2;
+        font-size: 10px;
+        font-weight: 800;
+        line-height: 17px;
+        text-align: center;
+      }
+
+      .pv em {
+        font-style: normal;
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--muted);
+      }
+
+      /* ============================================================
+         RESPONSIVE
+         ============================================================ */
+      @media (max-width: 900px) {
+        .nav-toggle {
+          display: grid;
+        }
+
+        .nav-links {
+          position: fixed;
+          top: calc(var(--nav-h) + 4px);
+          left: 12px;
+          right: 12px;
+          flex-direction: column;
+          align-items: stretch;
+          gap: 3px;
+          padding: 9px;
+          border-radius: 18px;
+          background: rgba(13, 15, 21, 0.97);
+          border: 1px solid var(--border);
+          box-shadow: 0 30px 60px -30px rgba(0, 0, 0, 0.9);
+          opacity: 0;
+          pointer-events: none;
+          transform: translateY(-10px);
+          transition: opacity 0.2s ease, transform 0.2s ease;
+        }
+
+        .nav-links.open {
+          opacity: 1;
+          pointer-events: auto;
+          transform: none;
+        }
+
+        .nav-links button,
+        .nav-links a {
+          text-align: left;
+          padding: 12px 14px;
+          font-size: 13.5px;
+          border-radius: 11px;
+        }
+      }
+
+      @media (max-width: 760px) {
+        .details {
+          left: 20px;
+          right: 20px;
+          width: auto;
+          bottom: 52px;
+          max-height: calc(100vh - var(--nav-h) - 62px);
+          max-height: calc(100dvh - var(--nav-h) - 62px);
+        }
+
+        .title-1,
+        .title-2 {
+          font-size: clamp(29px, 10.4vw, 44px);
+        }
+
+        .desc {
+          margin-top: 12px;
+          max-width: none;
+          font-size: 12.5px;
+          line-height: 1.68;
+        }
+
+        .detail-chips {
+          margin-top: 12px;
+        }
+
+        .cta {
+          margin-top: 16px;
+        }
+
+        .discover {
+          padding: 11px 18px;
+          font-size: 12.5px;
+        }
+
+        .pagination {
+          left: 20px;
+          right: 20px;
+          bottom: 98px;
+          gap: 10px;
+        }
+
+        .progress-sub-container {
+          flex: 1 1 auto;
+          width: auto;
+        }
+
+        .arrow {
+          width: 42px;
+          height: 42px;
+        }
+
+        .strip {
+          left: 20px;
+          right: 20px;
+          bottom: 34px;
+        }
+
+        .tile {
+          width: 46px;
+          height: 46px;
+          border-radius: 13px;
+          font-size: 13px;
+        }
+
+        .card-icon {
+          top: 27%;
+          right: -8%;
+          transform: none;
+          font-size: clamp(110px, 44vw, 190px);
+          opacity: 0.1;
+        }
+
+        .card-kicker {
+          font-size: 10px;
+          letter-spacing: 0.18em;
+        }
+
+        .copy {
+          font-size: 9.5px;
+          bottom: 10px;
+        }
+
+        .copy .hint {
+          display: none;
+        }
+
+        .mq-label {
+          margin: 18px 0 8px;
+          font-size: 9px;
+          letter-spacing: 0.14em;
+        }
+
+        .stat-strip {
+          margin-top: 16px;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          border-radius: 16px;
+        }
+
+        .stat-strip .st {
+          padding: 14px 14px 13px;
+        }
+
+        .stat-strip .st::before {
+          width: 17px;
+          margin-bottom: 10px;
+        }
+
+        .stat-strip .st b {
+          font-size: 19px;
+        }
+
+        .stat-strip .st span {
+          font-size: 8.5px;
+          letter-spacing: 0.08em;
+        }
+
+        .pv {
+          height: 42px;
+          padding: 0 13px;
+          border-radius: 12px;
+        }
+
+        .pv em {
+          font-size: 11px;
+        }
+      }
+
+      @media (max-width: 760px) and (max-height: 640px) {
+        .desc {
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+        }
+      }
+
+    </style>
+  </head>
+
+  <body>
+    <!-- ================= COVER (tirai pembuka) ================= -->
+    <div class="cover" id="cover">
+      <div class="cover-inner">
+        <div class="cover-mark"><i class="fas fa-user-secret"></i></div>
+        <div class="cover-text">Benxx Project</div>
+      </div>
+    </div>
+
+    <!-- ================= INDICATOR ================= -->
+    <div class="indicator"><span id="indicator"></span></div>
+
+    <!-- ================= NAV ================= -->
+    <nav class="topnav">
+      <a class="brand" href="#" id="brand">
+        <span class="brand-mark"><i class="fas fa-user-secret"></i></span>
+        <span class="brand-text">Benxx <em>Project</em></span>
+      </a>
+
+      <div class="nav-links" id="nav-links">
+        <button type="button" data-go="0" class="active">Beranda</button>
+        <button type="button" data-go="1">Protokol</button>
+        <button type="button" data-go="2">Cara Pakai</button>
+        <button type="button" data-go="5">Fitur</button>
+        <a href="https://t.me/Bleszh" target="_blank" rel="noopener">Kontak</a>
+      </div>
+
+      <button
+        type="button"
+        class="nav-toggle"
+        id="nav-toggle"
+        aria-label="Buka menu"
+      >
+        <i class="fas fa-bars"></i>
+      </button>
+    </nav>
+
+    <!-- ================= STAGE ================= -->
+    <main class="stage" id="stage">
+      <div class="card">
+        <span class="card-grid"></span>
+        <span class="card-glow"></span>
+        <span class="card-glow second"></span>
+        <span class="card-icon" id="card-icon"
+          ><i class="fas fa-user-secret"></i
+        ></span>
+        <span class="card-kicker" id="card-kicker">Benxx Project</span>
+      </div>
+
+      <section class="details">
+        <div class="place-box">
+          <span class="dash"></span>
+          <span class="text" id="d-place">Benxx Project</span>
+        </div>
+
+        <div class="title-box">
+          <h1 class="title-1" id="d-t1">IM</h1>
+        </div>
+        <div class="title-box">
+          <h1 class="title-2" id="d-t2">BENXX!</h1>
+        </div>
+
+        <p class="desc" id="d-desc">
+          Generator Akun V2ray berbasis Cloudflare Workers — cepat, gratis, dan
+          tanpa registrasi. Buat konfigurasi koneksi aman hanya dalam beberapa
+          klik.
+        </p>
+
+        <div class="detail-chips" id="d-chips"></div>
+
+        <div class="cta" id="d-cta-wrap">
+          <a class="discover" id="d-cta" href="dashboard.html"
+            >Buka Dashboard <i class="fas fa-arrow-right"></i
+          ></a>
+        </div>
+
+        <!-- ---- jaringan provider (statis, di bawah tombol) ---- -->
+        <div class="mq-label">ISP and Network Providers</div>
+        <div class="marquee">
+          <div class="marquee-row">
+            <div class="marquee-track" id="mq-a"></div>
+          </div>
+          <div class="marquee-row rev">
+            <div class="marquee-track" id="mq-b"></div>
+          </div>
+        </div>
+
+        <!-- ---- statistik (statis, di bawah jaringan) ---- -->
+        <div class="stat-strip">
+          <div class="st" style="--sc: #6366f1">
+            <b>2.000+</b><span>Node Aktif</span>
+          </div>
+          <div class="st" style="--sc: #38bdf8">
+            <b>1.200+</b><span>Pengguna Aktif</span>
+          </div>
+          <div class="st" style="--sc: #10b981">
+            <b>15 TB+</b><span>Data Ditransfer</span>
+          </div>
+          <div class="st" style="--sc: #f59e0b">
+            <b>2,4 jt+</b><span>Koneksi Aman</span>
+          </div>
+        </div>
+      </section>
+
+      <div class="pagination">
+        <button type="button" class="arrow" id="prev" aria-label="Sebelumnya">
+          <i class="fas fa-chevron-left"></i>
+        </button>
+        <button type="button" class="arrow" id="next" aria-label="Selanjutnya">
+          <i class="fas fa-chevron-right"></i>
+        </button>
+        <div class="progress-sub-container">
+          <div class="progress-sub-background">
+            <div class="progress-sub-foreground" id="progress"></div>
+          </div>
+        </div>
+        <div class="slide-numbers" id="slide-numbers"></div>
+      </div>
+
+      <div class="strip" id="strip"></div>
+
+      <div class="copy">
+        &copy; <span id="year"></span> Benxx Project. Hak Cipta Dilindungi.
+        <span class="sep">•</span>
+        <span class="hint">Geser ke kiri / kanan untuk berpindah</span>
+      </div>
+    </main>
+
+    <script>
+      (function () {
+        "use strict";
+
+        /* ============================================================
+           DATA — seluruh isi teks landing page Benxx Project
+           ============================================================ */
+        const SLIDES = [
+          {
+            kicker: "Generator Akun V2ray",
+            place: "Benxx Project",
+            t1: "IM",
+            t2: "BENXX!",
+            desc: "Generator Akun V2ray berbasis Cloudflare Workers — cepat, gratis, dan tanpa registrasi. Buat konfigurasi koneksi aman hanya dalam beberapa klik.",
+            icon: "fa-user-secret",
+            color: "#6366f1",
+          },
+          {
+            kicker: "Empat protokol populer",
+            place: "Protokol",
+            t1: "MULTI",
+            t2: "PROTOKOL",
+            desc: "Empat protokol populer siap dipakai untuk kebutuhan koneksi Anda. Protokol klasik dengan enkripsi berlapis — stabil untuk pemakaian harian.",
+            icon: "fa-shield-halved",
+            color: "#38bdf8",
+            chips: ["VMESS", "VLESS", "TROJAN", "SHADOW"],
+          },
+          {
+            kicker: "Cara Pakai",
+            place: "Cara Pakai · Langkah 01",
+            t1: "BUKA",
+            t2: "DASHBOARD",
+            desc: "Klik tombol “Buka Dashboard” untuk masuk ke panel Node Monitor. Tidak perlu daftar, tidak perlu login.",
+            icon: "fa-gauge-high",
+            color: "#818cf8",
+          },
+          {
+            kicker: "Cara Pakai",
+            place: "Cara Pakai · Langkah 02",
+            t1: "PILIH",
+            t2: "NODE AKTIF",
+            desc: "Dashboard otomatis memindai semua node dan hanya menampilkan yang benar-benar hidup — lengkap dengan latency-nya.",
+            icon: "fa-server",
+            color: "#22d3ee",
+          },
+          {
+            kicker: "Cara Pakai",
+            place: "Cara Pakai · Langkah 03",
+            t1: "GENERATE",
+            t2: "AKUN",
+            desc: "Pilih protokol, klik Create, lalu scan QR code atau copy URL konfigurasinya ke aplikasi V2ray favoritmu.",
+            icon: "fa-qrcode",
+            color: "#34d399",
+          },
+          {
+            kicker: "Fitur",
+            place: "Fitur 01",
+            t1: "BERBASIS",
+            t2: "CLOUDFLARE WORKERS",
+            desc: "Dibangun menggunakan platform Cloudflare Workers untuk kinerja optimal dan skalabilitas tinggi.",
+            icon: "fa-cloud",
+            color: "#6366f1",
+          },
+          {
+            kicker: "Fitur",
+            place: "Fitur 02",
+            t1: "DUKUNGAN",
+            t2: "MULTI-PROTOKOL",
+            desc: "Kompatibel dengan VMESS, VLESS, TROJAN, dan SHADOWSOCKS — memberikan fleksibilitas dalam konektivitas.",
+            icon: "fa-layer-group",
+            color: "#38bdf8",
+          },
+          {
+            kicker: "Fitur",
+            place: "Fitur 03",
+            t1: "BANDWIDTH",
+            t2: "TANPA BATAS",
+            desc: "Nikmati koneksi tanpa batasan bandwidth untuk pengalaman internet yang lebih stabil.",
+            icon: "fa-tachometer-alt",
+            color: "#10b981",
+          },
+          {
+            kicker: "Fitur",
+            place: "Fitur 04",
+            t1: "DUKUNGAN",
+            t2: "WILDCARD",
+            desc: "Fitur domain wildcard sedang dalam pengembangan. Akan tersedia dalam pembaruan mendatang.",
+            icon: "fa-asterisk",
+            color: "#f59e0b",
+            chips: ["SEGERA HADIR"],
+          },
+          {
+            kicker: "Fitur",
+            place: "Fitur 05",
+            t1: "KONEKSI",
+            t2: "TCP",
+            desc: "Hanya mendukung koneksi TCP untuk kestabilan dan keamanan yang lebih baik. UDP tidak didukung.",
+            icon: "fa-network-wired",
+            color: "#f43f5e",
+          },
+          {
+            kicker: "Siap Terhubung?",
+            place: "Mulai",
+            t1: "SIAP",
+            t2: "TERHUBUNG?",
+            desc: "Buka dashboard, pilih node tercepat, dan buat akun V2ray-mu dalam hitungan detik.",
+            icon: "fa-bolt",
+            color: "#8b5cf6",
+          },
+        ];
+
+        const TOTAL = SLIDES.length;
+        const DURATION = 3; /* detik per slide (auto loop, seperti referensi) */
+        const NAV_STOPS = [0, 1, 2, 5];
+
+        const _ = (id) => document.getElementById(id);
+        const root = document.documentElement;
+        /* Animasi SELALU aktif (tidak lagi dimatikan oleh prefers-reduced-motion),
+           plus pengaman bila GSAP gagal dimuat dari CDN. */
+        const hasGsap = typeof window.gsap !== "undefined";
+        const gsap = window.gsap;
+
+        const el = {
+          cover: _("cover"),
+          stage: _("stage"),
+          icon: _("card-icon"),
+          kicker: _("card-kicker"),
+          place: _("d-place"),
+          t1: _("d-t1"),
+          t2: _("d-t2"),
+          desc: _("d-desc"),
+          chips: _("d-chips"),
+          ctaWrap: _("d-cta-wrap"),
+          cta: _("d-cta"),
+          progress: _("progress"),
+          numbers: _("slide-numbers"),
+          strip: _("strip"),
+          indicator: _("indicator"),
+          navLinks: _("nav-links"),
+          navToggle: _("nav-toggle"),
+        };
+
+        let index = 0;
+        let timerId = null;
+
+        /* ============================================================
+           Bangun mini-cards (strip) + slide numbers
+           ============================================================ */
+        SLIDES.forEach(function (s, i) {
+          const tile = document.createElement("button");
+          tile.type = "button";
+          tile.className = "tile";
+          tile.setAttribute("aria-label", s.place);
+          tile.innerHTML = '<i class="fas ' + s.icon + '"></i>';
+          tile.addEventListener("click", function () {
+            go(i);
+          });
+          el.strip.appendChild(tile);
+
+          const num = document.createElement("span");
+          num.className = "item";
+          num.textContent = String(i + 1);
+          num.addEventListener("click", function () {
+            go(i);
+          });
+          el.numbers.appendChild(num);
+        });
+
+        const tiles = Array.prototype.slice.call(el.strip.children);
+        const nums = Array.prototype.slice.call(el.numbers.children);
+
+        /* ============================================================
+           Jaringan provider — 2 baris marquee berjalan berlawanan
+           ============================================================ */
+        const PROVIDERS = [
+          { name: "Cloudflare", slug: "cloudflare" },
+          { name: "Amazon Web Services", fa: "fa-aws" },
+          { name: "Google Cloud", slug: "googlecloud" },
+          { name: "Microsoft Azure", fa: "fa-microsoft" },
+          { name: "DigitalOcean", slug: "digitalocean" },
+          { name: "Vultr", slug: "vultr" },
+          { name: "Linode", fa: "fa-linode" },
+          { name: "Alibaba Cloud", slug: "alibabacloud" },
+          { name: "Akamai", slug: "akamai" },
+          { name: "Hetzner", slug: "hetzner" },
+          { name: "Contabo", slug: "contabo" },
+          { name: "OVHcloud", slug: "ovh" },
+          { name: "Scaleway", slug: "scaleway" },
+          { name: "Oracle Cloud", mono: "O" },
+          { name: "Aryaka", mono: "A" },
+          { name: "Fastly", slug: "fastly" },
+          { name: "Gcore", slug: "gcore" },
+          { name: "Backblaze", slug: "backblaze" },
+        ];
+
+        function tileHTML(p) {
+          /* kalau logo gagal dimuat, namanya tetap tampil */
+          let mark;
+          if (p.fa) {
+            mark = '<i class="fa-brands ' + p.fa + '"></i>';
+          } else if (p.mono) {
+            mark = '<span class="pv-mono">' + p.mono + "</span>";
+          } else {
+            mark =
+              '<img src="https://cdn.simpleicons.org/' +
+              p.slug +
+              '/8b93a7" alt="" onerror="this.remove()">';
+          }
+          return '<div class="pv">' + mark + "<em>" + p.name + "</em></div>";
+        }
+
+        (function buildProviders() {
+          const a = _("mq-a");
+          const b = _("mq-b");
+          if (!a || !b) return;
+          const half = Math.ceil(PROVIDERS.length / 2);
+          const rowA = PROVIDERS.slice(0, half);
+          const rowB = PROVIDERS.slice(half);
+          /* 3 salinan supaya loop mulus di layar lebar */
+          a.innerHTML = rowA.map(tileHTML).join("").repeat(3);
+          b.innerHTML = rowB.map(tileHTML).join("").repeat(3);
+        })();
+
+        /* ============================================================
+           Isi konten (tanpa animasi)
+           ============================================================ */
+        function setContent(i) {
+          const s = SLIDES[i];
+
+          el.place.textContent = s.place;
+          el.t1.textContent = s.t1;
+          el.t2.textContent = s.t2;
+          el.desc.textContent = s.desc;
+          el.kicker.textContent = s.kicker;
+          el.icon.innerHTML = '<i class="fas ' + s.icon + '"></i>';
+
+          /* warna tema slide */
+          root.style.setProperty("--slide-color", s.color);
+
+          /* chips opsional */
+          if (s.chips && s.chips.length) {
+            el.chips.innerHTML = s.chips
+              .map(function (c) {
+                return "<span>" + c + "</span>";
+              })
+              .join("");
+            el.chips.classList.add("on");
+          } else {
+            el.chips.innerHTML = "";
+            el.chips.classList.remove("on");
+          }
+
+          /* state aktif */
+          tiles.forEach(function (t, ti) {
+            t.classList.toggle("active", ti === i);
+          });
+          nums.forEach(function (n, ni) {
+            n.classList.toggle("active", ni === i);
+          });
+
+          /* nav aktif */
+          let stop = NAV_STOPS[0];
+          NAV_STOPS.forEach(function (v) {
+            if (i >= v) stop = v;
+          });
+          Array.prototype.forEach.call(
+            el.navLinks.querySelectorAll("button"),
+            function (b) {
+              b.classList.toggle("active", Number(b.dataset.go) === stop);
+            }
+          );
+        }
+
+        /* ============================================================
+           Animasi perpindahan slide (model GSAP dari referensi)
+           ============================================================ */
+        function animate(i) {
+          setContent(i);
+
+          if (!hasGsap) {
+            el.progress.style.width = ((i + 1) / TOTAL) * 100 + "%";
+            return;
+          }
+
+          const T = function (n) {
+            return n;
+          };
+
+          const tl = gsap.timeline({ defaults: { ease: "power4.out" } });
+
+          tl.fromTo(
+            ".place-box .text",
+            { yPercent: 130, opacity: 0 },
+            { yPercent: 0, opacity: 1, duration: T(0.6) },
+            0
+          )
+            .fromTo(
+              "#d-t1",
+              { yPercent: 118 },
+              { yPercent: 0, duration: T(0.95) },
+              0.04
+            )
+            .fromTo(
+              "#d-t2",
+              { yPercent: 118 },
+              { yPercent: 0, duration: T(0.95) },
+              0.12
+            )
+            .fromTo(
+              "#d-desc",
+              { y: 26, opacity: 0 },
+              { y: 0, opacity: 1, duration: T(0.6), ease: "power2.out" },
+              0.3
+            )
+            .fromTo(
+              "#d-chips span",
+              { y: 14, opacity: 0 },
+              {
+                y: 0,
+                opacity: 1,
+                duration: T(0.45),
+                stagger: 0.05,
+                ease: "power2.out",
+              },
+              0.34
+            )
+            .fromTo(
+              "#card-icon",
+              { scale: 0.72, opacity: 0, rotate: -10 },
+              {
+                scale: 1,
+                opacity: 0.14,
+                rotate: 0,
+                duration: T(1.1),
+                ease: "power3.out",
+              },
+              0.04
+            )
+            .fromTo(
+              ".card-glow",
+              { scale: 0.78, opacity: 0 },
+              {
+                scale: 1,
+                opacity: function (idx) {
+                  return idx === 1 ? 0.12 : 0.3;
+                },
+                duration: T(1.1),
+                ease: "power2.out",
+              },
+              0
+            )
+            .to(
+              "#progress",
+              {
+                width: ((i + 1) / TOTAL) * 100 + "%",
+                duration: T(0.6),
+                ease: "power2.out",
+              },
+              0
+            );
+
+          return tl;
+        }
+
+        /* ============================================================
+           Timer auto-loop + indicator sweep
+           ============================================================ */
+        function startTimer() {
+          if (timerId) {
+            clearTimeout(timerId);
+            timerId = null;
+          }
+          if (hasGsap) {
+            gsap.killTweensOf("#indicator");
+            gsap.fromTo(
+              "#indicator",
+              { width: "0%" },
+              { width: "100%", duration: DURATION, ease: "none" }
+            );
+          }
+
+          timerId = setTimeout(function () {
+            go(index + 1);
+          }, DURATION * 1000);
+        }
+
+        function go(i) {
+          const next = ((i % TOTAL) + TOTAL) % TOTAL;
+          if (next === index) {
+            startTimer();
+            return;
+          }
+          index = next;
+          animate(index);
+          startTimer();
+        }
+
+        /* ============================================================
+           Kontrol manual
+           ============================================================ */
+        _("prev").addEventListener("click", function () {
+          go(index - 1);
+        });
+        _("next").addEventListener("click", function () {
+          go(index + 1);
+        });
+
+        _("brand").addEventListener("click", function (e) {
+          e.preventDefault();
+          go(0);
+        });
+
+        Array.prototype.forEach.call(
+          el.navLinks.querySelectorAll("[data-go]"),
+          function (b) {
+            b.addEventListener("click", function () {
+              go(Number(b.dataset.go));
+              el.navLinks.classList.remove("open");
+            });
+          }
+        );
+
+        el.navToggle.addEventListener("click", function () {
+          el.navLinks.classList.toggle("open");
+        });
+
+        document.addEventListener("keydown", function (e) {
+          if (e.key === "ArrowLeft") go(index - 1);
+          if (e.key === "ArrowRight") go(index + 1);
+        });
+
+        /* swipe (diabaikan bila dimulai dari strip yang bisa di-scroll) */
+        let sx = null,
+          sy = null,
+          horiz = false;
+        el.stage.addEventListener(
+          "touchstart",
+          function (e) {
+            const t = e.touches[0];
+            sx = t.clientX;
+            sy = t.clientY;
+            horiz = false;
+          },
+          { passive: true }
+        );
+        el.stage.addEventListener(
+          "touchmove",
+          function (e) {
+            if (sx === null) return;
+            const t = e.touches[0];
+            const dx = t.clientX - sx;
+            const dy = t.clientY - sy;
+            if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 10) horiz = true;
+          },
+          { passive: true }
+        );
+        el.stage.addEventListener(
+          "touchend",
+          function (e) {
+            if (sx === null) return;
+            if (e.target.closest && e.target.closest(".strip")) {
+              sx = null;
+              sy = null;
+              return;
+            }
+            const t = e.changedTouches[0];
+            const dx = t.clientX - sx;
+            if (horiz && Math.abs(dx) > 50) go(index + (dx < 0 ? 1 : -1));
+            sx = null;
+            sy = null;
+            horiz = false;
+          },
+          { passive: true }
+        );
+
+        /* pause saat tab tidak aktif */
+        document.addEventListener("visibilitychange", function () {
+          if (document.hidden) {
+            if (timerId) clearTimeout(timerId);
+            timerId = null;
+            if (hasGsap) gsap.killTweensOf("#indicator");
+          } else {
+            startTimer();
+          }
+        });
+
+        /* ============================================================
+           Boot — buka tirai lalu mulai
+           ============================================================ */
+        function boot() {
+          try {
+            setContent(0);
+            el.progress.style.width = (1 / TOTAL) * 100 + "%";
+
+            /* tanpa GSAP: tampilkan langsung + auto-loop tetap jalan */
+            if (!hasGsap) {
+              el.cover.style.display = "none";
+              startTimer();
+              return;
+            }
+
+            const tl = gsap.timeline({ delay: 0.25 });
+            tl.to(".cover-inner", {
+              opacity: 0,
+              y: -18,
+              duration: 0.45,
+              ease: "power2.in",
+            })
+              .to(
+                "#cover",
+                { yPercent: -100, duration: 0.85, ease: "power4.inOut" },
+                "-=0.1"
+              )
+              .set("#cover", { display: "none" })
+              .add(function () {
+                animate(0);
+                startTimer();
+              });
+          } catch (err) {
+            /* pengaman terakhir: apa pun yang gagal, halaman tetap jalan */
+            if (el.cover) el.cover.style.display = "none";
+            startTimer();
+          }
+        }
+
+        /* watchdog: pastikan tirai tidak pernah nyangkut */
+        setTimeout(function () {
+          if (el.cover && el.cover.style.display !== "none") {
+            el.cover.style.display = "none";
+            startTimer();
+          }
+        }, 3000);
+
+        const yr = _("year");
+        if (yr) yr.textContent = new Date().getFullYear();
+
+        if (document.readyState === "loading") {
+          document.addEventListener("DOMContentLoaded", boot);
+        } else {
+          boot();
+        }
+      })();
+    </script>
+  </body>
+</html>
