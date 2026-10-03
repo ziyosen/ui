@@ -1993,8 +1993,9 @@
 
       async function loadSiteConfig() {
         let pages = null;
+        const bust = "?t=" + Date.now();
         try {
-          const res = await fetch(CONFIG_URL, { cache: "no-store" });
+          const res = await fetch(CONFIG_URL + bust, { cache: "no-store" });
           if (res.ok) {
             const cfg = await res.json();
             if (cfg && Array.isArray(cfg.serverDomains) && cfg.serverDomains.length) {
@@ -2006,7 +2007,7 @@
           }
         } catch (e) {}
         try {
-          const r2 = await fetch(ICONS_URL, { cache: "no-store" });
+          const r2 = await fetch(ICONS_URL + bust, { cache: "no-store" });
           if (r2.ok) {
             const icons = await r2.json();
             if (icons && typeof icons === "object") pageIcons = icons;
