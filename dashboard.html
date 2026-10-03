@@ -1281,21 +1281,9 @@
   <body>
     <!-- ================= AMBIENT BACKGROUND ================= -->
     <div class="bg-layer">
-      <video
-        id="bg-video"
-        playsinline
-        autoplay
-        loop
-        preload="auto"
-        crossorigin="anonymous"
-        src="https://raw.githubusercontent.com/ziy769/testt/main/VID_20250826_194454_747.mp4"
-      ></video>
       <div class="bg-grid"></div>
       <div class="bg-overlay"></div>
     </div>
-    <button id="unmute-btn" aria-label="Nyalakan suara">
-      <i class="fas fa-volume-high"></i>&nbsp; Nyalakan Suara
-    </button>
 
     <div class="sidebar-overlay" id="sidebar-overlay"></div>
 
@@ -1306,7 +1294,7 @@
           <div class="brand-mark"><i class="fas fa-network-wired"></i></div>
           <div>
             <div class="brand-name">Node Monitor</div>
-            <div class="brand-sub">Benxx Project</div>
+            <div class="brand-sub">ZEINTHHUB PROJECT</div>
           </div>
         </div>
 
@@ -1331,6 +1319,8 @@
           <span class="nav-text">Beranda</span>
         </a>
 
+        <div id="pages-nav"></div>
+
         <div class="sidebar-foot">
           <div class="sidebar-card">
             <div class="t">Dukung project ini</div>
@@ -1346,8 +1336,14 @@
             </a>
           </div>
 
-          <div class="sidebar-version">© 2025 Benxx Project · v2.0</div>
+          <div class="sidebar-version">© <span id="zeinth-year">2025</span> ZEINTHHUB PROJECT · v2.0</div>
         </div>
+        <script>
+          (function () {
+            var y = document.getElementById("zeinth-year");
+            if (y) y.textContent = new Date().getFullYear();
+          })();
+        </script>
       </aside>
 
       <!-- ================= MAIN ================= -->
@@ -1817,8 +1813,74 @@
       /* ==================== CONFIG ==================== */
       const defaultProxyUrl =
         "https://raw.githubusercontent.com/xiyosenstore/hompage/refs/heads/main/ProxyList%20(1)%20(1).txt";
-      const serverDomains = ["nuclear.benxxinquins.workers.dev", "kosong-om"];
+      let serverDomains = ["nuclear.benxxinquins.workers.dev", "kosong-om"];
       let selectedServerDomain = serverDomains[0];
+
+      /* ==================== SITE CONFIG (dikelola dari admin.html) ==================== */
+      const CONFIG_URL = "data/config.json";
+      const SERVER_DOMAIN_SELECTS = [
+        "vmess-server-domain",
+        "vless-server-domain",
+        "trojan-server-domain",
+        "ss-server-domain",
+      ];
+
+      function populateServerDomains() {
+        SERVER_DOMAIN_SELECTS.forEach(function (id) {
+          const select = document.getElementById(id);
+          if (!select) return;
+          const prev = select.value;
+          select.innerHTML = "";
+          serverDomains.forEach(function (d) {
+            const o = document.createElement("option");
+            o.value = d;
+            o.textContent = d;
+            select.appendChild(o);
+          });
+          if (prev && serverDomains.indexOf(prev) !== -1) select.value = prev;
+          if (!select.dataset.bound) {
+            select.dataset.bound = "1";
+            select.addEventListener("change", function () {
+              selectedServerDomain = this.value;
+            });
+          }
+        });
+        if (serverDomains.indexOf(selectedServerDomain) === -1) {
+          selectedServerDomain = serverDomains[0] || "";
+        }
+      }
+
+      function renderPagesNav(pages) {
+        const host = document.getElementById("pages-nav");
+        if (!host || !Array.isArray(pages)) return;
+        host.innerHTML = "";
+        pages.forEach(function (p) {
+          if (!p || !p.file || p.nav === false) return;
+          if (p.file === "dashboard.html" || p.file === "index.html") return;
+          const a = document.createElement("a");
+          a.className = "nav-item nav-link";
+          a.href = p.file;
+          a.innerHTML =
+            '<i class="fas fa-file-lines"></i><span class="nav-text">' +
+            String(p.title || p.file).replace(/[<>&\"]/g, "") +
+            "</span>";
+          host.appendChild(a);
+        });
+      }
+
+      async function loadSiteConfig() {
+        try {
+          const res = await fetch(CONFIG_URL, { cache: "no-store" });
+          if (!res.ok) return;
+          const cfg = await res.json();
+          if (cfg && Array.isArray(cfg.serverDomains) && cfg.serverDomains.length) {
+            serverDomains = cfg.serverDomains.filter(Boolean);
+            selectedServerDomain = serverDomains[0];
+            populateServerDomains();
+          }
+          if (cfg && Array.isArray(cfg.pages)) renderPagesNav(cfg.pages);
+        } catch (e) {}
+      }
       const defaultUUID = "2bcfbfba-b446-4ad5-93ad-72af9e008f61";
       const itemsPerPage = 10;
 
@@ -2462,24 +2524,8 @@
         });
 
         // Server domains
-        [
-          "vmess-server-domain",
-          "vless-server-domain",
-          "trojan-server-domain",
-          "ss-server-domain",
-        ].forEach((id) => {
-          const select = document.getElementById(id);
-          select.innerHTML = "";
-          serverDomains.forEach((d) => {
-            const o = document.createElement("option");
-            o.value = d;
-            o.textContent = d;
-            select.appendChild(o);
-          });
-          select.addEventListener("change", function () {
-            selectedServerDomain = this.value;
-          });
-        });
+        populateServerDomains();
+        loadSiteConfig();
 
         // Bug -> wildcard
         const bugInputs = ["vmess", "vless", "trojan", "ss"].map((t) =>
@@ -2675,31 +2721,5 @@
       }
     </script>
 
-    <script>
-      (function () {
-        const video = document.getElementById("bg-video");
-        const btn = document.getElementById("unmute-btn");
-        if (!video || !btn) return;
-        video.volume = 0.6;
-        function tryPlay() {
-          video
-            .play()
-            .then(() => (btn.style.display = "none"))
-            .catch(() => {
-              video.muted = true;
-              video.play();
-              btn.style.display = "block";
-            });
-        }
-        btn.addEventListener("click", function () {
-          video.muted = false;
-          video.volume = 0.7;
-          video.play().then(() => (btn.style.display = "none"));
-        });
-        if (document.readyState === "loading")
-          document.addEventListener("DOMContentLoaded", tryPlay);
-        else tryPlay();
-      })();
-    </script>
   </body>
 </html>
