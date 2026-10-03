@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Benxx Project — Generator Akun V2ray</title>
+    <title>ZEINTHHUB PROJECT — Generator Akun V2ray</title>
     <meta
       name="description"
       content="Generator akun V2ray berbasis Cloudflare Workers. VMESS, VLESS, TROJAN, dan SHADOWSOCKS — gratis, cepat, tanpa registrasi."
@@ -107,6 +107,14 @@
         font-weight: 600;
       }
 
+      .cover-logo {
+        width: min(80vw, 390px);
+        height: auto;
+        display: block;
+        margin: 0 auto;
+        filter: drop-shadow(0 24px 60px rgba(99, 102, 241, 0.35));
+      }
+
       /* ============================================================
          INDICATOR — garis sweep di paling atas
          ============================================================ */
@@ -181,6 +189,18 @@
         color: var(--muted);
         font-weight: 500;
         margin-left: 5px;
+      }
+
+      .brand-logo {
+        height: 38px;
+        width: auto;
+        display: block;
+      }
+
+      @media (max-width: 420px) {
+        .brand-logo {
+          height: 31px;
+        }
       }
 
       .nav-links {
@@ -929,11 +949,71 @@
   </head>
 
   <body>
+    <!-- ================= LOGO SPRITE — ZEINTHHUB PROJECT ================= -->
+    <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+      <defs>
+        <linearGradient id="zgrad" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="#818cf8" />
+          <stop offset="0.55" stop-color="#6366f1" />
+          <stop offset="1" stop-color="#4338ca" />
+        </linearGradient>
+        <linearGradient id="zmark" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#ffffff" />
+          <stop offset="1" stop-color="#c7d2fe" />
+        </linearGradient>
+        <linearGradient id="ztxt" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0" stop-color="#ffffff" />
+          <stop offset="1" stop-color="#c7d2fe" />
+        </linearGradient>
+        <filter id="zglow" x="-60%" y="-60%" width="220%" height="220%">
+          <feGaussianBlur stdDeviation="3.2" result="b" />
+          <feMerge>
+            <feMergeNode in="b" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
+      </defs>
+      <symbol id="zeinth-logo" viewBox="0 0 400 96">
+        <g filter="url(#zglow)">
+          <path d="M48 6 L82 25 V63 L48 82 L14 63 V25 Z" fill="url(#zgrad)" />
+        </g>
+        <path
+          d="M48 6 L82 25 V63 L48 82 L14 63 V25 Z"
+          fill="none"
+          stroke="rgba(255,255,255,0.42)"
+          stroke-width="1.4"
+        />
+        <path d="M31 30 H65 V38 L45 56 H65 V64 H31 V56 L51 38 H31 Z" fill="url(#zmark)" />
+        <circle cx="82" cy="25" r="3.4" fill="#38bdf8" />
+        <circle cx="14" cy="63" r="3.4" fill="#38bdf8" />
+        <circle cx="48" cy="82" r="3.4" fill="#818cf8" />
+        <text
+          x="112"
+          y="48"
+          font-family="Inter, system-ui, -apple-system, 'Segoe UI', sans-serif"
+          font-size="37"
+          font-weight="800"
+          letter-spacing="0.5"
+          fill="url(#ztxt)"
+        >ZEINTHHUB</text>
+        <text
+          x="114"
+          y="76"
+          font-family="Inter, system-ui, -apple-system, 'Segoe UI', sans-serif"
+          font-size="14.5"
+          font-weight="600"
+          letter-spacing="9"
+          fill="#939aab"
+        >PROJECT</text>
+      </symbol>
+    </svg>
+
     <!-- ================= COVER (tirai pembuka) ================= -->
     <div class="cover" id="cover">
       <div class="cover-inner">
-        <div class="cover-mark"><i class="fas fa-user-secret"></i></div>
-        <div class="cover-text">Benxx Project</div>
+        <svg class="cover-logo" viewBox="0 0 400 96" role="img" aria-label="ZEINTHHUB PROJECT">
+          <use href="#zeinth-logo" />
+        </svg>
       </div>
     </div>
 
@@ -943,8 +1023,9 @@
     <!-- ================= NAV ================= -->
     <nav class="topnav">
       <a class="brand" href="#" id="brand">
-        <span class="brand-mark"><i class="fas fa-user-secret"></i></span>
-        <span class="brand-text">Benxx <em>Project</em></span>
+        <svg class="brand-logo" viewBox="0 0 400 96" role="img" aria-label="ZEINTHHUB PROJECT">
+          <use href="#zeinth-logo" />
+        </svg>
       </a>
 
       <div class="nav-links" id="nav-links">
@@ -974,20 +1055,20 @@
         <span class="card-icon" id="card-icon"
           ><i class="fas fa-user-secret"></i
         ></span>
-        <span class="card-kicker" id="card-kicker">Benxx Project</span>
+        <span class="card-kicker" id="card-kicker">ZEINTHHUB PROJECT</span>
       </div>
 
       <section class="details">
         <div class="place-box">
           <span class="dash"></span>
-          <span class="text" id="d-place">Benxx Project</span>
+          <span class="text" id="d-place">ZEINTHHUB PROJECT</span>
         </div>
 
         <div class="title-box">
           <h1 class="title-1" id="d-t1">IM</h1>
         </div>
         <div class="title-box">
-          <h1 class="title-2" id="d-t2">BENXX!</h1>
+          <h1 class="title-2" id="d-t2">ZEINTHHUB!</h1>
         </div>
 
         <p class="desc" id="d-desc">
@@ -1050,7 +1131,7 @@
       <div class="strip" id="strip"></div>
 
       <div class="copy">
-        &copy; <span id="year"></span> Benxx Project. Hak Cipta Dilindungi.
+        &copy; <span id="year"></span> ZEINTHHUB PROJECT. Hak Cipta Dilindungi.
         <span class="sep">•</span>
         <span class="hint">Geser ke kiri / kanan untuk berpindah</span>
       </div>
@@ -1061,14 +1142,14 @@
         "use strict";
 
         /* ============================================================
-           DATA — seluruh isi teks landing page Benxx Project
+           DATA — seluruh isi teks landing page ZEINTHHUB PROJECT
            ============================================================ */
         const SLIDES = [
           {
             kicker: "Generator Akun V2ray",
-            place: "Benxx Project",
+            place: "ZEINTHHUB PROJECT",
             t1: "IM",
-            t2: "BENXX!",
+            t2: "ZEINTHHUB!",
             desc: "Generator Akun V2ray berbasis Cloudflare Workers — cepat, gratis, dan tanpa registrasi. Buat konfigurasi koneksi aman hanya dalam beberapa klik.",
             icon: "fa-user-secret",
             color: "#6366f1",
@@ -1557,17 +1638,18 @@
               return;
             }
 
-            const tl = gsap.timeline({ delay: 0.25 });
+            const tl = gsap.timeline({ delay: 0.6 });
             tl.to(".cover-inner", {
               opacity: 0,
-              y: -18,
-              duration: 0.45,
-              ease: "power2.in",
+              y: -26,
+              scale: 0.94,
+              duration: 1.2,
+              ease: "power2.inOut",
             })
               .to(
                 "#cover",
-                { yPercent: -100, duration: 0.85, ease: "power4.inOut" },
-                "-=0.1"
+                { yPercent: -100, duration: 3.4, ease: "power3.inOut" },
+                "-=0.4"
               )
               .set("#cover", { display: "none" })
               .add(function () {
@@ -1587,7 +1669,7 @@
             el.cover.style.display = "none";
             startTimer();
           }
-        }, 3000);
+        }, 7000);
 
         const yr = _("year");
         if (yr) yr.textContent = new Date().getFullYear();
@@ -1597,6 +1679,29 @@
         } else {
           boot();
         }
+      })();
+    </script>
+
+    <!-- halaman dinamis dari data/config.json (dikelola lewat admin.html) -->
+    <script>
+      (function () {
+        fetch("data/config.json", { cache: "no-store" })
+          .then(function (r) { return r.ok ? r.json() : null; })
+          .then(function (cfg) {
+            if (!cfg || !Array.isArray(cfg.pages)) return;
+            var nav = document.getElementById("nav-links");
+            if (!nav) return;
+            var kontak = nav.querySelector('a[href*="t.me"]');
+            cfg.pages.forEach(function (p) {
+              if (!p || !p.file || p.nav === false) return;
+              if (p.file === "index.html") return;
+              var a = document.createElement("a");
+              a.href = p.file;
+              a.textContent = p.title || p.file;
+              nav.insertBefore(a, kontak);
+            });
+          })
+          .catch(function () {});
       })();
     </script>
   </body>
