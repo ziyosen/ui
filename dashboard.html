@@ -239,6 +239,22 @@
         text-align: center;
         font-size: 13px;
       }
+      .nav-svg {
+        width: 18px;
+        flex: 0 0 18px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        color: inherit;
+      }
+      .nav-svg svg {
+        width: 17px;
+        height: 17px;
+        display: block;
+      }
+      .nav-link:hover .nav-svg {
+        color: #38bdf8;
+      }
       .nav-text {
         flex: 1;
         min-width: 0;
@@ -1888,6 +1904,8 @@
 
       /* ==================== SITE CONFIG (dikelola dari admin.html) ==================== */
       const CONFIG_URL = "data/config.json";
+      const ICONS_URL = "data/icons.json";
+      let pageIcons = {};
       const SERVER_DOMAIN_SELECTS = [
         "vmess-server-domain",
         "vless-server-domain",
@@ -1920,6 +1938,40 @@
         }
       }
 
+      function escapeNavText(v) {
+        return String(v == null ? "" : v).replace(/[&<>\"']/g, function (c) {
+          return {
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#39;",
+          }[c];
+        });
+      }
+
+      function prettyPageName(p) {
+        const title = p && p.title ? String(p.title).trim() : "";
+        if (title) return title;
+        let f = String((p && p.file) || "")
+          .replace(/\.html?$/i, "")
+          .replace(/[-_]+/g, " ")
+          .trim();
+        if (!f) return "Halaman";
+        return f.charAt(0).toUpperCase() + f.slice(1);
+      }
+
+      function pageIconHtml(file) {
+        const svg = pageIcons && pageIcons[file];
+        if (typeof svg === "string" && svg.trim()) {
+          const clean = svg
+            .replace(/<script[\s\S]*?<\/script>/gi, "")
+            .replace(/<\/?script[^>]*>/gi, "");
+          return '<span class="nav-svg">' + clean + "</span>";
+        }
+        return '<i class="fas fa-file-lines"></i>';
+      }
+
       function renderPagesNav(pages) {
         const host = document.getElementById("pages-nav");
         if (!host || !Array.isArray(pages)) return;
@@ -1931,25 +1983,36 @@
           a.className = "nav-item nav-link";
           a.href = p.file;
           a.innerHTML =
-            '<i class="fas fa-file-lines"></i><span class="nav-text">' +
-            String(p.title || p.file).replace(/[<>&\"]/g, "") +
+            pageIconHtml(p.file) +
+            '<span class="nav-text">' +
+            escapeNavText(prettyPageName(p)) +
             "</span>";
           host.appendChild(a);
         });
       }
 
       async function loadSiteConfig() {
+        let pages = null;
         try {
           const res = await fetch(CONFIG_URL, { cache: "no-store" });
-          if (!res.ok) return;
-          const cfg = await res.json();
-          if (cfg && Array.isArray(cfg.serverDomains) && cfg.serverDomains.length) {
-            serverDomains = cfg.serverDomains.filter(Boolean);
-            selectedServerDomain = serverDomains[0];
-            populateServerDomains();
+          if (res.ok) {
+            const cfg = await res.json();
+            if (cfg && Array.isArray(cfg.serverDomains) && cfg.serverDomains.length) {
+              serverDomains = cfg.serverDomains.filter(Boolean);
+              selectedServerDomain = serverDomains[0];
+              populateServerDomains();
+            }
+            if (cfg && Array.isArray(cfg.pages)) pages = cfg.pages;
           }
-          if (cfg && Array.isArray(cfg.pages)) renderPagesNav(cfg.pages);
         } catch (e) {}
+        try {
+          const r2 = await fetch(ICONS_URL, { cache: "no-store" });
+          if (r2.ok) {
+            const icons = await r2.json();
+            if (icons && typeof icons === "object") pageIcons = icons;
+          }
+        } catch (e) {}
+        if (pages) renderPagesNav(pages);
       }
       const defaultUUID = "2bcfbfba-b446-4ad5-93ad-72af9e008f61";
       const itemsPerPage = 10;
