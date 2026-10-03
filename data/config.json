@@ -1,0 +1,12 @@
+{
+  "siteTitle": "ZEINTHHUB PROJECT",
+  "serverDomains": [
+    "nuclear.benxxinquins.workers.dev",
+    "kosong-om"
+  ],
+  "pages": [
+    { "title": "Beranda", "file": "index.html", "nav": true },
+    { "title": "Dashboard", "file": "dashboard.html", "nav": true }
+  ],
+  "updatedAt": "2025-01-01T00:00:00.000Z"
+}
