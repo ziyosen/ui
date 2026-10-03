@@ -5,8 +5,21 @@
     "kosong-om"
   ],
   "pages": [
-    { "title": "Beranda", "file": "index.html", "nav": true },
-    { "title": "Dashboard", "file": "dashboard.html", "nav": true }
+    {
+      "title": "Beranda",
+      "file": "index.html",
+      "nav": true
+    },
+    {
+      "title": "Dashboard",
+      "file": "dashboard.html",
+      "nav": true
+    },
+    {
+      "title": "testing",
+      "file": "testing.html",
+      "nav": true
+    }
   ],
-  "updatedAt": "2025-01-01T00:00:00.000Z"
+  "updatedAt": "2026-10-03T20:20:43.163Z"
 }
