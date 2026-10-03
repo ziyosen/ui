@@ -2,7 +2,7 @@
   "siteTitle": "ZEINTHHUB PROJECT",
   "serverDomains": [
     "nuclear.benxxinquins.workers.dev",
-    "kosong-om"
+    "Testing.com"
   ],
   "pages": [
     {
@@ -16,5 +16,5 @@
       "nav": true
     }
   ],
-  "updatedAt": "2026-10-03T21:00:45.459Z"
+  "updatedAt": "2026-10-03T21:02:47.103Z"
 }
