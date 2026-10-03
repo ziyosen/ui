@@ -171,6 +171,8 @@
         background: rgba(10, 11, 15, 0.72);
         backdrop-filter: blur(22px);
         border-right: 1px solid var(--border);
+        overflow-y: auto;
+        overscroll-behavior: contain;
         transition: transform 0.25s ease;
       }
       .sidebar-brand {
@@ -266,6 +268,65 @@
       .sidebar-foot {
         margin-top: auto;
         padding-top: 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      .foot-panel {
+        display: flex;
+        align-items: center;
+        gap: 11px;
+        padding: 11px 12px;
+        border-radius: 13px;
+        text-decoration: none;
+        color: var(--text);
+        background: linear-gradient(
+          135deg,
+          rgba(99, 102, 241, 0.16),
+          rgba(79, 70, 229, 0.08)
+        );
+        border: 1px solid rgba(99, 102, 241, 0.32);
+        transition: all 0.18s ease;
+      }
+      .foot-panel:hover {
+        border-color: rgba(99, 102, 241, 0.6);
+        background: linear-gradient(
+          135deg,
+          rgba(99, 102, 241, 0.24),
+          rgba(79, 70, 229, 0.12)
+        );
+        transform: translateY(-1px);
+      }
+      .fp-icon {
+        width: 34px;
+        height: 34px;
+        flex: 0 0 34px;
+        border-radius: 10px;
+        display: grid;
+        place-items: center;
+        color: #fff;
+        font-size: 14px;
+        background: linear-gradient(135deg, #6366f1, #4f46e5);
+        box-shadow: 0 10px 24px -12px rgba(99, 102, 241, 0.9);
+      }
+      .fp-text {
+        min-width: 0;
+        flex: 1;
+      }
+      .fp-text b {
+        display: block;
+        font-size: 12.5px;
+        font-weight: 650;
+      }
+      .fp-text span {
+        display: block;
+        font-size: 10.5px;
+        color: var(--muted-2);
+        margin-top: 1px;
+      }
+      .fp-arrow {
+        font-size: 10px;
+        color: var(--muted-2);
       }
       .sidebar-card {
         border: 1px solid var(--border);
@@ -307,7 +368,7 @@
         text-align: center;
         font-size: 10.5px;
         color: var(--muted-2);
-        margin-top: 14px;
+        margin-top: 2px;
       }
 
       .sidebar-overlay {
@@ -1322,8 +1383,17 @@
         <div id="pages-nav"></div>
 
         <div class="sidebar-foot">
+          <a class="foot-panel" href="admin.html">
+            <span class="fp-icon"><i class="fas fa-sliders"></i></span>
+            <span class="fp-text">
+              <b>Control Panel</b>
+              <span>Kelola domain &amp; halaman</span>
+            </span>
+            <i class="fas fa-chevron-right fp-arrow"></i>
+          </a>
+
           <div class="sidebar-card">
-            <div class="t">Dukung project ini</div>
+            <div class="t"><i class="fas fa-hand-holding-heart"></i> Dukung project ini</div>
             <div class="d">Bantu biaya server agar tetap gratis.</div>
             <a
               id="donation-button"
@@ -1332,7 +1402,7 @@
               target="_blank"
               rel="noopener noreferrer"
             >
-              <i class="fas fa-hand-holding-heart"></i> Donasi
+              Donasi
             </a>
           </div>
 
