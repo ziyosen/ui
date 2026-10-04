@@ -14,7 +14,12 @@
       "title": "Dashboard",
       "file": "dashboard.html",
       "nav": true
+    },
+    {
+      "title": "subslink",
+      "file": "sub.html",
+      "nav": true
     }
   ],
-  "updatedAt": "2026-10-04T18:51:31.841Z"
+  "updatedAt": "2026-10-04T19:29:36.590Z"
 }
