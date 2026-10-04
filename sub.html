@@ -3,14 +3,81 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mengalihkan...</title>
-    <meta http-equiv="refresh" content="0;url=https://sublink-worker.benxx.workers.dev/">
+    <title>wait a minute...</title>
+    <meta http-equiv="refresh" content="7;url=https://sublink-worker.benxx.workers.dev/">
+    
+    <style>
+        /* Gaya untuk mengatur tampilan agar berada di tengah */
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: #1a1a2e; /* Warna latar belakang gelap */
+            color: #ffffff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        /* Animasi Spinner */
+        .loader {
+            width: 60px;
+            height: 60px;
+            border: 6px solid rgba(255, 255, 255, 0.1);
+            border-top-color: #00d2ff; /* Warna garis spinner */
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Teks Loading berkedip perlahan */
+        .loading-text {
+            font-size: 18px;
+            letter-spacing: 1.5px;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        /* Tautan manual jika loading gagal */
+        .manual-link {
+            margin-top: 20px;
+            font-size: 13px;
+            color: #8892b0;
+        }
+        
+        .manual-link a {
+            color: #00d2ff;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .manual-link a:hover {
+            color: #3a86ff;
+            text-decoration: underline;
+        }
+    </style>
 </head>
 <body>
-    <p>Sedang mengalihkan ke server... <a href="https://sublink-worker.benxx.workers.dev/">klik di sini</a>.</p>
+
+    <!-- Elemen Loading -->
+    <div class="loader"></div>
+    <div class="loading-text">Sedang memuat, tunggu sebentar...</div>
+    
 
     <script>
-        window.location.replace("https://sublink-worker.benxx.workers.dev/");
+        setTimeout(function() {
+            window.location.replace("https://sublink-worker.benxx.workers.dev/");
+        }, 7000);
     </script>
 
 </body>
