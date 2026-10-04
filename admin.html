@@ -220,9 +220,10 @@
             <button class="btn btn-ghost" id="pick-file"><i class="fas fa-folder-open"></i> Pilih File .html</button>
             <button class="btn btn-ghost" id="use-template"><i class="fas fa-wand-magic-sparkles"></i> Isi Template Dasar</button>
             <button class="btn btn-ghost" id="pg-icon-save"><i class="fas fa-image"></i> Simpan Logo</button>
-            <button class="btn btn-primary" id="save-page"><i class="fas fa-floppy-disk"></i> Simpan Halaman</button>
+            <button class="btn btn-primary" id="save-page"><i class="fas fa-cloud-arrow-up"></i> Simpan &amp; Unggah Halaman</button>
             <button class="btn btn-ghost" id="cancel-page">Batal</button>
           </div>
+          <p class="sub" style="margin:10px 0 0">Tombol <b>Simpan &amp; Unggah Halaman</b> langsung menulis file ini ke repo GitHub. Tombol <b>Simpan Menu ke Repo</b> menyimpan semua perubahan daftar menu.</p>
           <input type="file" id="file-input" accept=".html,.htm,text/html" class="hidden" />
         </div>
       </div>
@@ -720,18 +721,29 @@
     });
   }
 
-  function savePageToState() {
+  /* Kumpulkan isi editor ke daftar halaman. Mengembalikan true kalau berhasil. */
+  function stagePage() {
     var title = $id("pg-title").value.trim();
     var file = $id("pg-file").value.trim();
     var content = $id("pg-content").value;
     var nav = $id("pg-nav").checked;
     var icon = cleanSvg($id("pg-icon") ? $id("pg-icon").value : "");
 
-    if (!title) return toast("Judul halaman wajib diisi", false);
-    if (!file) return toast("Nama file wajib diisi", false);
-    if (!content.trim()) return toast("Kode HTML masih kosong", false);
-
+    if (!content.trim()) {
+      toast("Kode HTML masih kosong — tempel atau unggah isinya dulu", false);
+      return false;
+    }
+    /* Judul dan nama file saling melengkapi — cukup salah satu diisi. */
+    if (!file && title) file = title;
+    if (!file) {
+      toast("Isi nama file atau judul halaman dulu", false);
+      return false;
+    }
     file = sanitizeFile(file);
+    if (!title) {
+      title = file.replace(/\.html?$/i, "").replace(/[-_]+/g, " ").trim();
+      title = title ? title.charAt(0).toUpperCase() + title.slice(1) : "Halaman";
+    }
     var page = { title: title, file: file, nav: nav, content: content };
 
     if (state.editing >= 0 && state.originalFile && state.originalFile !== file) {
@@ -749,10 +761,11 @@
 
     closeEditor();
     renderPages();
-    toast("Halaman siap — klik “Simpan Menu ke Repo”", true);
+    return true;
   }
 
-  function saveMenuToRepo() {
+  /* Tulis semua perubahan (file halaman + logo + menu) ke repo GitHub. */
+  function commitToRepo() {
     if (!state.token) {
       toast("Masukkan token dulu di tab Pengaturan", false);
       switchTab("settings");
@@ -931,8 +944,24 @@
       $id("pg-icon").value = "";
       openEditor(-1);
     });
-    $id("save-pages").addEventListener("click", saveMenuToRepo);
-    $id("save-page").addEventListener("click", savePageToState);
+    $id("save-pages").addEventListener("click", function () {
+      /* Kalau editor masih terbuka, ikut disimpan supaya pekerjaan tidak hilang. */
+      var editor = $id("page-editor");
+      if (editor && !editor.classList.contains("hidden")) {
+        var c = $id("pg-content").value.trim();
+        if (c && c !== "Memuat…" && !stagePage()) return;
+      }
+      commitToRepo();
+    });
+    $id("save-page").addEventListener("click", function () {
+      if (!stagePage()) return;
+      if (state.token) {
+        commitToRepo();
+      } else {
+        toast("Tersimpan di panel. Hubungkan token GitHub di Pengaturan untuk mengunggah.", false);
+        switchTab("settings");
+      }
+    });
     $id("cancel-page").addEventListener("click", closeEditor);
     $id("pick-file").addEventListener("click", function () { $id("file-input").click(); });
     $id("file-input").addEventListener("change", onPickFile);
