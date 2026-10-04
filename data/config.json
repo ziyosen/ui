@@ -19,7 +19,12 @@
       "title": "Buat Sublink",
       "file": "sub.html",
       "nav": true
+    },
+    {
+      "title": "yo",
+      "file": "yo.html",
+      "nav": true
     }
   ],
-  "updatedAt": "2026-10-04T20:05:24.326Z"
+  "updatedAt": "2026-10-04T20:29:08.340Z"
 }
